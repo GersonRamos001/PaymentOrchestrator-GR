@@ -8,6 +8,7 @@ import com.unicomer.paymentService.exception.PaymentValidationException;
 import com.unicomer.paymentService.repository.CustomerRepository;
 import com.unicomer.paymentService.repository.PaymentMethodRepository;
 import com.unicomer.paymentService.service.PaymentService;
+import com.unicomer.paymentService.util.PaymentConstants;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,7 @@ import java.util.UUID;
 @Slf4j
 public class PaymentServiceImp implements PaymentService {
 
-    private static final double MAXIMUM_ALLOWED_AMOUNT = 1000.0;
+    private final PaymentConstants paymentConstants;
     private CustomerRepository customerRepository;
     private PaymentMethodRepository paymentMethodRepository;
 
@@ -41,8 +42,8 @@ public class PaymentServiceImp implements PaymentService {
         }
         // validate amount
         if (!verifyAmount(paymentRequestDto.getAmount())) {
-            log.info("Invalid amount: {}. It must be greater than 0 and less than or equal to {}", paymentRequestDto.getAmount(), MAXIMUM_ALLOWED_AMOUNT);
-            throw new PaymentValidationException("El monto que está intentando pagar supera el máximo permitido de " + MAXIMUM_ALLOWED_AMOUNT);
+            log.info("Invalid amount: {}. It must be greater than 0 and less than or equal to {}", paymentRequestDto.getAmount(), paymentConstants.getMaximumAllowedAmount());
+            throw new PaymentValidationException("El monto que está intentando pagar supera el máximo permitido de " + paymentConstants.getMaximumAllowedAmount());
         }
 
 
@@ -79,11 +80,7 @@ public class PaymentServiceImp implements PaymentService {
      * than the maximum allowed amount.
      */
     public boolean verifyAmount(double amount) {
-    if (amount <= 0 || amount > MAXIMUM_ALLOWED_AMOUNT) {
-        return false;
-
-    }
-        return true;
+        return amount > 0 && amount <= paymentConstants.getMaximumAllowedAmount();
     }
 
 

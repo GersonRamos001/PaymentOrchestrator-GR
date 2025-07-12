@@ -36,3 +36,9 @@ springdoc:
     path: /swagger-ui.html
     operationsSorter: method
     tagsSorter: alpha
+
+
+#CONSTANTS
+payment:
+  validation:
+    maximum-allowed-amount: 1000.0
