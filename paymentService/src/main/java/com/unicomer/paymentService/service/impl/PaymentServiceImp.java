@@ -4,6 +4,7 @@ import com.unicomer.paymentService.dto.PaymentRequestDto;
 import com.unicomer.paymentService.entity.Account;
 import com.unicomer.paymentService.entity.Customer;
 import com.unicomer.paymentService.entity.PaymentMethod;
+import com.unicomer.paymentService.exception.PaymentValidationException;
 import com.unicomer.paymentService.repository.CustomerRepository;
 import com.unicomer.paymentService.repository.PaymentMethodRepository;
 import com.unicomer.paymentService.service.PaymentService;
@@ -26,25 +27,25 @@ public class PaymentServiceImp implements PaymentService {
     private PaymentMethodRepository paymentMethodRepository;
 
     @Override
-    public boolean validatePaymentRequest(PaymentRequestDto paymentRequestDto) {
+    public void validatePaymentRequest(PaymentRequestDto paymentRequestDto) {
         // validate user
         if (!verifyCustomer(paymentRequestDto.getCustomerId())) {
             log.info("Invalid customer ID: {}", paymentRequestDto.getCustomerId());
-            return false;
+            throw new PaymentValidationException("El ID del cliente no es válido");
         }
 
         // validate account
         if (!verifyAccount(paymentRequestDto.getAccountId(), paymentRequestDto.getCustomerId())) {
             log.info("Invalid account ID: {} for customer ID: {}", paymentRequestDto.getAccountId(), paymentRequestDto.getCustomerId());
-            return false;
+            throw new PaymentValidationException("La cuenta no pertenece al cliente especificado");
         }
         // validate amount
         if (!verifyAmount(paymentRequestDto.getAmount())) {
             log.info("Invalid amount: {}. It must be greater than 0 and less than or equal to {}", paymentRequestDto.getAmount(), MAXIMUM_ALLOWED_AMOUNT);
-            return false;
+            throw new PaymentValidationException("El monto que está intentando pagar supera el máximo permitido de " + MAXIMUM_ALLOWED_AMOUNT);
         }
 
-        return true;
+
     }
 
 

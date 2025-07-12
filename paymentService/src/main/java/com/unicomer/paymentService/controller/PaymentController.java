@@ -32,7 +32,8 @@ public class PaymentController {
     private final PaymentService paymentService;
     @Operation(
             summary = "Process a payment",
-            description = "Processes a payment request for a given customer and account. Returns the payment details if successful."
+            description = "Processes a payment request for a given customer and account. " +
+                    "Returns the payment details if successful or an error message if validation fails."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -58,22 +59,7 @@ public class PaymentController {
         log.info("Received payment request for customerId: {}, accountId: {}, amount: {}, currency: {}",
                 requestDto.getCustomerId(), requestDto.getAccountId(), requestDto.getAmount(), requestDto.getCurrency());
 
-        if (!paymentService.validatePaymentRequest(requestDto)) {
-            log.info("Payment request validation failed for customerId: {}, accountId: {}, amount: {}, currency: {}",
-                    requestDto.getCustomerId(), requestDto.getAccountId(), requestDto.getAmount(), requestDto.getCurrency());
-
-            ApiResponseDto<PaymentResponseDto> errorResponse = ApiResponseDto.<PaymentResponseDto>builder()
-                    .timestamp(LocalDateTime.now())
-                    .message("Payment request validation failed")
-                    .path(request.getRequestURI())
-                    .data(null)
-                    .build();
-
-            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-        }
-
-        log.info("Payment request validation correct for customerId: {}, accountId: {}, amount: {}, currency: {}",
-                requestDto.getCustomerId(), requestDto.getAccountId(), requestDto.getAmount(), requestDto.getCurrency());
+        paymentService.validatePaymentRequest(requestDto);
 
         PaymentResponseDto paymentResponse = PaymentResponseDto.builder()
                 .paymentId("paymentId")

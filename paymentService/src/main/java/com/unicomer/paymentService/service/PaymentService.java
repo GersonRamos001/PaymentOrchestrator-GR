@@ -5,5 +5,5 @@ import com.unicomer.paymentService.dto.PaymentRequestDto;
 import org.springframework.stereotype.Service;
 
 public interface PaymentService {
-    boolean validatePaymentRequest(PaymentRequestDto paymentRequestDto);
+    void validatePaymentRequest(PaymentRequestDto paymentRequestDto);
 }
